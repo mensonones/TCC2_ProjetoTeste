@@ -221,7 +221,7 @@
             <div class="modal-body">
 
                 <!-- content goes here -->
-                <form name="contatoForm">
+                <form name="contatoForm1">
 
                     <input class="form-control" type="text" name="nome" ng-model="nome2"
                            placeholder="Nome" ng-required="true" ng-minlength="10"/>
@@ -235,12 +235,12 @@
                     <input class="form-control" type="text" name="tipo" ng-model="tipo2" placeholder="Tipo contato. Ex: AMIGO" ng-required="true"/>
 
                     <button class="btn btn-primary btn-block" ng-click="atualizarContato($scope.contatoUpdate)"
-                            ng-disabled="contatoForm.$invalid">Atualizar Contato</button>
+                            data-dismiss="modal" ng-disabled="contatoForm1.$invalid">Atualizar Contato</button>
                 </form>
 
                 <br/>
 
-                <div ng-messages="contatoForm.nome.$error" class="alert alert-danger">
+                <div ng-messages="contatoForm1.nome.$error" class="alert alert-danger">
 
                     <div ng-message="required">
                         Por favor, preencha o campo nome!
@@ -251,21 +251,16 @@
                     </div>
 
                 </div>
-                <div ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty" class="alert alert-danger">
+                <div ng-show="contatoForm1.telefone.$error.required && contatoForm.telefone.$dirty" class="alert alert-danger">
                     Por favor, preencha o campo telefone!
                 </div>
 
-                <div ng-show="contatoForm.telefone.$error.pattern" class="alert alert-danger">
+                <div ng-show="contatoForm1.telefone.$error.pattern" class="alert alert-danger">
                     O campo telefone deve ter o formato: 00000-0000
                 </div>
 
             </div>
             <div class="modal-footer">
-                <div class="btn-group btn-group-justified" role="group" aria-label="group button">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default btn-block" data-dismiss="modal"  role="button">Fechar</button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
