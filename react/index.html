@@ -83,7 +83,13 @@
         constructor(props){
             super(props);
             this.state = {
-                data: [],
+                data: [{
+                    nome: '',
+                    telefone: '',
+                    email: '',
+                    imagem: null,
+                    tipo: '',
+                }],
                 isOpen: false,
             }
             this.toggleModal = this.toggleModal.bind(this);
@@ -98,7 +104,7 @@
 
         async componentDidMount() {
             try {
-                const res = await fetch('https://django-api-tcc.herokuapp.com/api/');
+                const res = await fetch('//127.0.0.1:8000/api/');
                 const data = await res.json();
                 this.setState({
                     data
@@ -108,12 +114,68 @@
                 console.log(e);
             }
         }
+
+        imageUpload(e) {
+            const reader = new FileReader();
+            const file = e.target.files[0];
+
+            reader.onload = (upload) => {
+                this.setState({
+                    imagem: upload.target.result,
+                });
+            };
+
+            reader.readAsDataURL(file);
+        };
+
+        async enviarDados(e, file){
+
+            e.preventDefault();
+
+            const {nome, telefone, email, imagem, tipo} = this.state;
+
+            const options = {
+                method: 'post',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'nome':nome, 'telefone':telefone, 'email':email, 'imagem':imagem, 'tipo':tipo})
+
+            };
+
+            fetch('//127.0.0.1:8000/api/', options)
+                .then(response => {
+                    console.log('aqui: '+ response)
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Something went wrong ...');
+                    }
+                })
+                .catch(error => this.setState({error}));
+
+        }
+
+        onChange(e){
+            const state = this.state;
+            console.log(e.target.value);
+            state[e.target.name] = e.target.value;
+            this.setState(state);
+        };
+
+        onImageLoad(e){
+            console.log('onImageLoad', e.target.files[0]);
+            this.enviarDados(e.target.files[0]);
+        }
+
+
         render() {
             return  <section className="">
                 {this.state.data.map(item => (
-                    <section key={item.id} className="column">
-                        <div className="card card-alinhar">
-                            <img src={`http://res.cloudinary.com/dbtkozbgn/${item.imagem}`} height="50%" width="50%" alt="profile-image"/>
+                    <section className="column">
+                        <div key={item.id} className="card card-alinhar">
+                            <img src={`//127.0.0.1:8000${item.imagem}`} height="50%" width="50%" alt="profile-image"/>
                                 <div className="container">
                                     <h4><b>{item.nome}</b></h4>
                                     <p>{item.email}</p>
@@ -132,8 +194,8 @@
                                                 <input type="tel"  placeholder="telefone"/>
                                                 Tipo:
                                                 <select name="tipo" form="tipo_form">
-                                                    <option value="volvo">Amigo</option>
-                                                    <option value="saab">Trabalho</option>
+                                                    <option value="AMG">Amigo</option>
+                                                    <option value="TRAB">Trabalho</option>
                                                 </select>
                                                 <br/><br/>
                                                 <input type="file"/>
@@ -149,17 +211,17 @@
                 <section className="container-form">
                     <div className="div-form">
                         <h3>Cadastrar Contato</h3>
-                    <form>
-                        <input type="text" placeholder="nome"/>
-                        <input type="email" placeholder="email"/>
-                        <input type="tel"  placeholder="telefone"/>
+                    <form onSubmit={this.enviarDados.bind(this)}>
+                        <input onChange={this.onChange.bind(this)} name="nome" type="text" placeholder="nome"/>
+                        <input onChange={this.onChange.bind(this)} name="email" type="email" placeholder="email"/>
+                        <input onChange={this.onChange.bind(this)} name="telefone" type="tel"  placeholder="telefone"/>
                         Tipo:
-                        <select name="tipo" form="tipo_form">
-                            <option value="volvo">Amigo</option>
-                            <option value="saab">Trabalho</option>
+                        <select onChange={this.onChange.bind(this)} name="tipo" form="tipo_form">
+                            <option value="AMG">Amigo</option>
+                            <option value="TRAB">Trabalho</option>
                         </select>
                         <br/><br/>
-                        <input type="file"/>
+                        <input id="imagem" onChange={this.imageUpload.bind(this)} name="imagem" type="file"/>
                         <br/><br/>
                         <button className="estilo-btn" type="">Cadastrar</button>
                     </form>
@@ -172,12 +234,12 @@
 
     class Modal extends React.Component {
         render() {
-            // Render nothing if the "show" prop is false
+
             if(!this.props.show) {
                 return null;
             }
 
-            // The gray background
+
             const backdropStyle = {
                 position: 'fixed',
                 top: 0,
@@ -188,7 +250,7 @@
                 padding: 50
             };
 
-            // The modal "window"
+
             const modalStyle = {
                 backgroundColor: '#fff',
                 borderRadius: 5,
