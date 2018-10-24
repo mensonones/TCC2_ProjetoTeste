@@ -77,25 +77,27 @@
 <body>
 <div id="root"></div>
 
-<script data-plugins="transform-es2015-modules-umd" type="text/babel">
+<script type="text/babel">
     class Agenda extends React.Component {
 
         constructor(props){
             super(props);
             this.state = {
                 data: [{
+                    id:'',
                     nome: '',
                     telefone: '',
                     email: '',
-                    imagem: null,
+                    // imagem: '',
                     tipo: '',
                 }],
                 dataModal: [{
-                    nome: '',
-                    telefone: '',
-                    email: '',
-                    imagem: null,
-                    tipo: '',
+                    idU: '',
+                    nomeU: '',
+                    telefoneU: '',
+                    emailU: '',
+                    // imagemU: '',
+                    tipoU: '',
                 }],
                 isOpen: false,
             };
@@ -103,53 +105,23 @@
             this.getObjeto = this.getObjeto.bind(this);
         }
 
-
         toggleModal() {
             this.setState({
                 isOpen: !this.state.isOpen
             });
         }
 
-        async componentDidMount() {
-            try {
-                const res = await fetch('//127.0.0.1:8000/api/');
-                const data = await res.json();
-                this.setState({
-                    data
-                });
-                console.log(data);
-            } catch (e) {
-                console.log(e);
-            }
+        componentDidMount() {
+            fetch('//127.0.0.1:8000/api/')
+                .then(response => response.json())
+                .then(data => this.setState({ data }));
         }
 
-        imageUpload(e) {
-            const reader = new FileReader();
-            const file = e.target.files[0];
-
-            reader.onload = (upload) => {
-                this.setState({
-                    imagem: upload.target.result,
-                });
-                console.log(upload.target.result);
-            };
-
-            reader.readAsDataURL(file);
-        };
-
-        async enviarDados(e, file){
+        async enviarDados(e){
 
             e.preventDefault();
 
-            const {nome, telefone, email, imagem, tipo} = this.state;
-
-           // const newData = {
-           //     nome: this.state.nome,
-           //     telefone: this.state.telefone,
-            //    email: this.state.email,
-            //    imagem: this.state.imagem,
-           //     tipo: this.state.tipo,
-          //  };
+            const {nome, telefone, email, tipo} = this.state;
 
             const options = {
                 method: 'post',
@@ -158,22 +130,81 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({'nome':nome, 'telefone':telefone, 'email':email,
-                    'imagem':imagem, 'tipo':tipo})
+                    'tipo':tipo})
 
             };
 
             fetch('//127.0.0.1:8000/api/', options)
-                .then(response => {
-                    console.log('aqui: '+ response)
-                    if (response.ok) {
-                        //return response.json();
-                       // this.setState({data:[newData, ...this.state.data]})
-                        this.setState({nome: '', imagem: '', email: '', telefone: '', tipo: ''})
-                    } else {
-                        throw new Error('Something went wrong ...');
-                    }
+                .then(res => {
+                    return res.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    //let oldData = this.state.data;
+                    //this.setState({data:[oldData, ...this.state.data]});
+                    this.setState({nome: '', imagem: '', email: '', telefone: '', tipo: ''});
                 })
                 .catch(error => this.setState({error}));
+        }
+
+
+        async atualizarDados(e){
+
+            e.preventDefault();
+
+            const {id, nome, telefone, email, tipo} = this.state.dataModal;
+
+            const options = {
+                method: 'put',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'id':id,'nome':nome, 'telefone':telefone, 'email':email, 'tipo':tipo})
+
+            };
+
+            fetch('//127.0.0.1:8000/api/'+id+'/', options)
+                .then(res => {
+                    return res.json();
+                })
+                .then(data => {
+                    //console.log(data);
+                    console.log(this.state.dataModal);
+                    //let oldData = this.state.data;
+                    //this.setState({data:[oldData, ...this.state.data]});
+                    this.setState({nome: '', email: '', telefone: '', tipo: ''});
+                })
+                .catch(error => this.setState({error}));
+        }
+
+        async deletarDado(e,data) {
+
+            e.preventDefault();
+
+
+            const {id} = data;
+
+            const options = {
+                method: 'delete',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'id': id})
+
+            };
+
+            if (window.confirm('Deseja deletar o contato?')) {
+                fetch(`//127.0.0.1:8000/api/${id}/`, options)
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(data => {
+                    })
+                    .catch(error => this.setState({error}));
+            }
+
         }
 
         onChange(e){
@@ -183,71 +214,87 @@
             this.setState(state);
         };
 
-        getObjeto(e, data){
-            //console.log(data);
-            this.setState({dataModal: data});
+
+        onChangeUpdate(e){
+            console.log(e.target.value);
             this.setState({
-                isOpen: !this.state.isOpen
+                dataModal: {
+                    ...this.state.dataModal,
+                    [e.target.name]: e.target.value
+                },
             });
-            console.log(this.state.dataModal);
+        };
+
+        getObjeto(e, data, index){
+            e.preventDefault();
+
+            this.setState({ dataModal: data, isOpen: !this.state.isOpen }, () => {
+                console.log(this.state.dataModal, 'objectSelected');
+                console.log(index);
+            });
         }
 
 
         render() {
             return  <section className="">
-                {this.state.data.map(item => (
-                    <section className="column">
-                        <div key={item.id} className="card card-alinhar">
+                {this.state.data.map((item, i) =>
+                    <section key={i} className="column">
+                        <div className="card card-alinhar">
                             <img src={`//127.0.0.1:8000${item.imagem}`} height="50%" width="50%" alt="profile-image"/>
-                                <div className="container">
-                                    <h4><b>{item.nome}</b></h4>
-                                    <p>{item.email}</p>
-                                    <p>{item.tipo}</p>
-                                    <hr/>
+                            <div className="container">
+                                <h4><b>{item.nome}</b></h4>
+                                <p>{item.email}</p>
+                                <p>{item.tipo}</p>
+                                <hr/>
 
-                                    <Modal show={this.state.isOpen}
-                                           onClose={this.toggleModal}>
-                                        <div className="div-form">
-                                            <h3>Cadastrar Contato</h3>
-                                            <form>
-                                                <input type="text" value={this.state.dataModal.nome} placeholder="nome"/>
-                                                <input type="email" value={this.state.dataModal.email} placeholder="email"/>
-                                                <input type="tel" value={this.state.dataModal.telefone}  placeholder="telefone"/>
-                                                Tipo:
-                                                <select value={this.state.dataModal.tipo} name="tipo" form="tipo_form">
-                                                    <option value="AMG">Amigo</option>
-                                                    <option value="TRAB">Trabalho</option>
-                                                </select>
-                                                <br/><br/>
-                                                <input value={this.state.dataModal.imagem} type="file"/>
-                                                <br/><br/>
-                                                <button className="estilo-btn" type="submit">Cadastrar</button>
-                                            </form>
-                                        </div>
-                                    </Modal>
-                                </div>
-                            <button className="estilo-btn" type="button" onClick={((e) => this.getObjeto(e, item))}>Atualizar</button>
-                            <button className="estilo-btn" type="button">Deletar</button>
+                                <Modal show={this.state.isOpen}
+                                       onClose={this.toggleModal}
+                                        id={this.state.dataModal.id}>
+                                    <div className="div-form">
+                                        ID: {this.state.dataModal.id}
+                                        <h3>Atualizar Contato</h3>
+                                        <form onSubmit={this.atualizarDados.bind(this)}>
+                                            <input name="nome" id="nomeU" type="text" onChange={this.onChangeUpdate.bind(this)}
+                                                   value={this.state.dataModal.nome} placeholder="nome"/>
+                                            <input type="email" id="emailU" name="email" onChange={this.onChangeUpdate.bind(this)}
+                                                   value={this.state.dataModal.email} id="email"/>
+                                            <input type="tel" id="telefoneU" name="telefone" onChange={this.onChangeUpdate.bind(this)}
+                                                   defaultValue={this.state.dataModal.telefone}  placeholder="telefone"/>
+                                            Tipo:
+                                            <select value={this.state.dataModal.tipo} id="tipoU"
+                                                    onChange={this.onChangeUpdate.bind(this)} name="tipo" form="tipo_form">
+                                                <option value="AMG">Amigo</option>
+                                                <option value="TRAB">Trabalho</option>
+                                            </select>
+                                            <br/><br/>
+                                            <br/><br/>
+                                            <button className="estilo-btn" type="submit">Atualizar</button>
+                                        </form>
+                                    </div>
+                                </Modal>
+                            </div>
+                            <button className="estilo-btn" type="button" onClick={((e) => this.getObjeto(e, item, i))}>Atualizar</button>
+                            <button className="estilo-btn" type="button" onClick={((e) => this.deletarDado(e, item))}>Deletar</button>
                         </div>
                     </section>
-                ))}
+                )}
                 <section className="container-form">
                     <div className="div-form">
                         <h3>Cadastrar Contato</h3>
-                    <form onSubmit={this.enviarDados.bind(this)}>
-                        <input onChange={this.onChange.bind(this)} value={this.state.nome} name="nome" type="text" placeholder="nome"/>
-                        <input onChange={this.onChange.bind(this)} value={this.state.email} name="email" type="email" placeholder="email"/>
-                        <input onChange={this.onChange.bind(this)} value={this.state.telefone} name="telefone" type="tel"  placeholder="telefone"/>
-                        Tipo:
-                        <select value={this.state.tipo} onChange={this.onChange.bind(this)} name="tipo" form="tipo_form">
-                            <option value="AMG">Amigo</option>
-                            <option value="TRAB">Trabalho</option>
-                        </select>
-                        <br/><br/>
-                        <input id="imagem" value={this.state.imagem} onChange={this.imageUpload.bind(this)} name="imagem" type="file"/>
-                        <br/><br/>
-                        <button className="estilo-btn" type="">Cadastrar</button>
-                    </form>
+                        <form onSubmit={this.enviarDados.bind(this)}>
+                            <input onChange={this.onChange.bind(this)} value={this.state.nome} name="nome" type="text" placeholder="nome"/>
+                            <input onChange={this.onChange.bind(this)} value={this.state.email} name="email" type="email" placeholder="email"/>
+                            <input onChange={this.onChange.bind(this)} value={this.state.telefone} name="telefone" type="tel"  placeholder="telefone"/>
+                            Tipo:
+                            <select value={this.state.tipo} onChange={this.onChange.bind(this)} name="tipo" form="tipo_form">
+                                <option value="AMG">Amigo</option>
+                                <option value="TRAB">Trabalho</option>
+                            </select>
+                            <br/><br/>
+
+                            <br/><br/>
+                            <button className="estilo-btn" type="">Cadastrar</button>
+                        </form>
                     </div>
                 </section>
 
@@ -256,12 +303,12 @@
     }
 
     class Modal extends React.Component {
+
         render() {
 
             if(!this.props.show) {
                 return null;
             }
-
 
             const backdropStyle = {
                 position: 'fixed',
@@ -287,7 +334,6 @@
                 <div className="backdrop" style={backdropStyle}>
                     <div className="modal" style={modalStyle}>
                         {this.props.children}
-
                         <div className="footer">
                             <button className="estilo-btn" onClick={this.props.onClose}>
                                 close
@@ -302,7 +348,8 @@
     Modal.propTypes = {
         onClose: React.PropTypes.func.isRequired,
         show: React.PropTypes.bool,
-        children: React.PropTypes.node
+        children: React.PropTypes.node,
+        id: React.PropTypes.number
     };
 
     ReactDOM.render(
