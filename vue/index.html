@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <title>Agenda - VueJs</title>
+</head>
+
+<body>
+<section>
+
+</section>
+<section className="column" id="app">
+    <div v-bind:style="[card, cardalinhar]" v-for="dados in data">
+        <img v-bind:src="'//127.0.0.1:8000' + dados.imagem" alt="profile-image" v-bind:style="[altura, largura]" class="imagem" />
+        <div v-bind:style="[container]">
+            <h4><b>{{dados.nome}}</b></h4>
+            <p>{{dados.email}}</p>
+            <p>{{dados.tipo}}</p>
+            <hr />
+        </div>
+        <button v-bind:style="[estilobtn]" id="launchDialog" type="button">Atualizar</button>
+        <button v-bind:style="[estilobtn]" type="button">Deletar</button>
+    </div>
+
+    <section v-bind:style="containerform">
+        <div v-bind:style="divform">
+            <h3>Cadastrar Contato</h3>
+            <form>
+                <input name="nome" type="text" placeholder="nome" />
+                <input name="email" type="email" placeholder="email" />
+                <input name="telefone" type="tel" placeholder="telefone" />
+                Tipo:
+                <select name="tipo">
+                    <option value="AMG">Amigo</option>
+                    <option value="TRAB">Trabalho</option>
+                </select>
+                <br /><br />
+
+                <br /><br />
+                <button className="estilo-btn" type="">Cadastrar</button>
+            </form>
+        </div>
+    </section>
+
+    <dialog v-bind:style="[modalStyle, backdropStyle]" id="dialog">
+        <h3>Cadastrar Contato</h3>
+        <form>
+            <input name="nome" type="text" placeholder="nome" />
+            <input name="email" type="email" placeholder="email" />
+            <input name="telefone" type="tel" placeholder="telefone" />
+            Tipo:
+            <select name="tipo">
+                <option value="AMG">Amigo</option>
+                <option value="TRAB">Trabalho</option>
+            </select>
+            <br /><br />
+
+            <br /><br />
+            <button v-bind:style="[estilobtn]" id="cancelar">Cancelar</button>
+            <button v-bind:style="[estilobtn]" type="">Cadastrar</button>
+        </form>
+    </dialog>
+</section>
+<script type="text/javascript">
+    window.onload = function() {
+        const dialogBtn = document.getElementById('launchDialog');
+        const dialog = document.getElementById('dialog');
+        const close = document.getElementById('cancelar')
+
+        dialogBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            dialog.show();
+        });
+        close.addEventListener('click', (e) => {
+            e.preventDefault();
+            dialog.close();
+        })
+
+    };
+
+    const myHeaders = new Headers();
+
+    const options = {
+        method: 'GET',
+        headers: myHeaders,
+        mode: 'cors',
+        cache: 'default'
+    };
+
+    new Vue({
+        el: '#app',
+        data: {
+            data: [],
+            altura: {
+                height: '50%',
+            },
+            largura: {
+                width: '50%',
+            },
+            card: {
+                boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+                transition: '0.3s',
+                width: '20%',
+            },
+            cardalinhar: {
+                margin: 0,
+                padding: 0,
+            },
+            container: {
+                padding: '2px 16px',
+            },
+
+            estilobtn: {
+                padding: '5px 15p',
+                background: '#ccc',
+                border: '0 none',
+                cursor: 'pointer',
+                webkitBorderRadius: '5px',
+                borderRadius: '5px',
+            },
+            inputsTexto: {
+                padding: '5px',
+                border: '2px solid #ccc',
+                webkitBorderRadius: '5px',
+                borderRadius: '5px',
+            },
+            inputsEmail: {
+                padding: '5px; border:2px solid #ccc',
+                webkitBorderRadius: '5px',
+                borderRadius: '5px',
+
+            },
+            inputsTel: {
+                padding: '5px; border:2px solid #ccc',
+                webkitBorderRadius: '5px',
+                bordeRadius: '5px',
+            },
+
+            divform: {
+                margin: 0,
+                padding: 0,
+            },
+            containerform: {
+                position: 'absolute',
+                top: '10px',
+                right: 0,
+                width: '400px',
+                height: '200px',
+                border: '2px solid darkgrey',
+            },
+
+            modalStyle: {
+                backgroundColor: '#fff',
+                borderRadius: 5,
+                maxWidth: 400,
+                minHeight: 200,
+                margin: '0 auto',
+                padding: 30
+            },
+
+            backdropStyle: {
+                position: 'fixed',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                padding: 50
+            },
+        },
+
+        created: function() {
+            this.fetchData();
+        },
+
+        methods: {
+            fetchData: function() {
+                fetch('http://127.0.0.1:8000/api/', options)
+                    .then(response => response.json())
+                    .then(json => this.data = json)
+            }
+        },
+
+    });
+</script>
+</body>
+
+</html>
