@@ -22,38 +22,37 @@
             <p>{{dados.tipo}}</p>
             <hr />
         </div>
-        <button v-bind:style="[estilobtn]" id="launchDialog" type="button">Atualizar</button>
+        <button v-bind:style="[estilobtn]" id="launchDialog" v-on:click="getObject(dados)" type="button">Atualizar</button>
         <button v-bind:style="[estilobtn]" type="button">Deletar</button>
     </div>
 
     <section v-bind:style="containerform">
         <div v-bind:style="divform">
             <h3>Cadastrar Contato</h3>
-            <form>
-                <input name="nome" type="text" placeholder="nome" />
-                <input name="email" type="email" placeholder="email" />
-                <input name="telefone" type="tel" placeholder="telefone" />
+            <form v-on:submit.prevent="createContato()">
+                <input name="nome" v-model="newContato.nome" type="text" placeholder="nome" />
+                <input name="email" v-model="newContato.email" type="email" placeholder="email" />
+                <input name="telefone" v-model="newContato.telefone" type="tel" placeholder="telefone" />
                 Tipo:
-                <select name="tipo">
+                <select name="tipo" id="tipo" v-model="newContato.tipo">
                     <option value="AMG">Amigo</option>
                     <option value="TRAB">Trabalho</option>
                 </select>
                 <br /><br />
-
                 <br /><br />
-                <button className="estilo-btn" type="">Cadastrar</button>
+                <button v-bind:style="[estilobtn]" type="submit">Cadastrar</button>
             </form>
         </div>
     </section>
 
     <dialog v-bind:style="[modalStyle, backdropStyle]" id="dialog">
         <h3>Cadastrar Contato</h3>
-        <form>
-            <input name="nome" type="text" placeholder="nome" />
-            <input name="email" type="email" placeholder="email" />
-            <input name="telefone" type="tel" placeholder="telefone" />
+        <form v-on:submit.prevent="createContato()">
+            <input name="nome" v-model="newContato.nome" type="text" placeholder="nome" />
+            <input name="email" v-model="newContato.email" type="email" placeholder="email" />
+            <input name="telefone" v-model="newContato.telefone" type="tel" placeholder="telefone" />
             Tipo:
-            <select name="tipo">
+            <select name="tipo" v-model="newContato.tipo">
                 <option value="AMG">Amigo</option>
                 <option value="TRAB">Trabalho</option>
             </select>
@@ -61,7 +60,7 @@
 
             <br /><br />
             <button v-bind:style="[estilobtn]" id="cancelar">Cancelar</button>
-            <button v-bind:style="[estilobtn]" type="">Cadastrar</button>
+            <button v-bind:style="[estilobtn]" type="submit">Cadastrar</button>
         </form>
     </dialog>
 </section>
@@ -79,22 +78,41 @@
             e.preventDefault();
             dialog.close();
         })
-
     };
 
     const myHeaders = new Headers();
 
-    const options = {
+    const optionsget = {
         method: 'GET',
         headers: myHeaders,
         mode: 'cors',
         cache: 'default'
     };
 
+    const optionspost = {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json, text/plain, */*, multipart/form-data',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.newContato)
+    };
+
     new Vue({
         el: '#app',
         data: {
-            data: [],
+            data:[],
+            contatos: [],
+            currentContato: {},
+            newContato: {
+                nome: null,
+                email: null,
+                telefone: null,
+                tipo: null
+            },
+
+            response: " ",
+
             altura: {
                 height: '50%',
             },
@@ -177,11 +195,47 @@
             this.fetchData();
         },
 
+        mounted() {
+            this.fetchData();
+        },
+
+        getObject: function(object){
+            console.log(object);
+        },
+
         methods: {
+
+            getObject: function(object){
+                console.log(object);
+            },
+
             fetchData: function() {
-                fetch('http://127.0.0.1:8000/api/', options)
+                fetch('http://127.0.0.1:8000/api/', optionsget)
                     .then(response => response.json())
                     .then(json => this.data = json)
+            },
+
+            createContato: function(data) {
+                const nome = document.querySelector("input[name=nome]").value;
+                const email = document.querySelector("input[name=email]").value;
+                const telefone = document.querySelector("input[name=telefone]").value;
+                const e = document.getElementById("tipo");
+                const tipo = e.options[e.selectedIndex].value;
+
+                fetch('http://127.0.0.1:8000/api/', {
+                        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+                        headers: new Headers({
+                            'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                            'Content-Type': 'application/json'
+                        }),
+                        body: JSON.stringify({'nome':nome, 'email': email, 'telefone': telefone, 'tipo': tipo}), // Coordinate the body type with 'Content-Type'
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                    })
+                    .catch(error => console.error(error))
             }
         },
 
