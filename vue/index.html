@@ -19,11 +19,12 @@
         <div v-bind:style="[container]">
             <h4><b>{{dados.nome}}</b></h4>
             <p>{{dados.email}}</p>
+            <p>{{dados.telefone}}</p>
             <p>{{dados.tipo}}</p>
             <hr />
         </div>
-        <button v-bind:style="[estilobtn]" id="launchDialog" v-on:click="getObject(dados)" type="button">Atualizar</button>
-        <button v-bind:style="[estilobtn]" type="button">Deletar</button>
+        <button v-bind:style="[estilobtn]" id="myBtn" v-on:click="getObject(dados), dialog1()" type="button">Atualizar</button>
+        <button v-bind:style="[estilobtn]" type="button" v-on:click="getObject(dados), deleteContato()">Deletar</button>
     </div>
 
     <section v-bind:style="containerform">
@@ -45,39 +46,28 @@
         </div>
     </section>
 
-    <dialog v-bind:style="[modalStyle, backdropStyle]" id="dialog">
-        <h3>Cadastrar Contato</h3>
-        <form v-on:submit.prevent="createContato()">
-            <input name="nome" v-model="newContato.nome" type="text" placeholder="nome" />
-            <input name="email" v-model="newContato.email" type="email" placeholder="email" />
-            <input name="telefone" v-model="newContato.telefone" type="tel" placeholder="telefone" />
+    <dialog id="window" v-bind:style="[modalStyle, backdropStyle]">
+        Atualizar Contato <br /><br />
+        <form v-on:submit.prevent="updateContato()">
+            <input id="nomeU" :value="contatoUpdate.nome" type="text" placeholder="nome" />
+            <input id="emailU" :value="contatoUpdate.email" type="email" placeholder="email" />
+            <input id="telefoneU" :value="contatoUpdate.telefone" type="tel" placeholder="telefone" />
             Tipo:
-            <select name="tipo" v-model="newContato.tipo">
+            <select id="tipoU" :value="contatoUpdate.tipo">
                 <option value="AMG">Amigo</option>
                 <option value="TRAB">Trabalho</option>
             </select>
             <br /><br />
-
             <br /><br />
-            <button v-bind:style="[estilobtn]" id="cancelar">Cancelar</button>
             <button v-bind:style="[estilobtn]" type="submit">Cadastrar</button>
+            <button id="exit" v-bind:style="[estilobtn]" v-on:click.prevent="closedialog()">Exit</button>
         </form>
     </dialog>
+
 </section>
 <script type="text/javascript">
     window.onload = function() {
-        const dialogBtn = document.getElementById('launchDialog');
-        const dialog = document.getElementById('dialog');
-        const close = document.getElementById('cancelar')
 
-        dialogBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            dialog.show();
-        });
-        close.addEventListener('click', (e) => {
-            e.preventDefault();
-            dialog.close();
-        })
     };
 
     const myHeaders = new Headers();
@@ -101,7 +91,7 @@
     new Vue({
         el: '#app',
         data: {
-            data:[],
+            data: [],
             contatos: [],
             currentContato: {},
             newContato: {
@@ -111,7 +101,12 @@
                 tipo: null
             },
 
-            response: " ",
+            contatoUpdate: {
+                nome: null,
+                email: null,
+                telefone: null,
+                tipo: null
+            },
 
             altura: {
                 height: '50%',
@@ -191,7 +186,7 @@
             },
         },
 
-        created: function() {
+        created() {
             this.fetchData();
         },
 
@@ -199,14 +194,26 @@
             this.fetchData();
         },
 
-        getObject: function(object){
-            console.log(object);
-        },
 
         methods: {
 
-            getObject: function(object){
-                console.log(object);
+            dialog1() {
+                const dialog = document.getElementById('window');
+
+                dialog.show();
+            },
+
+            closedialog() {
+                const dialog = document.getElementById('window');
+                dialog.close();
+            },
+
+            getObject(object) {
+                //let teste = this.contatoUpdate;
+                //console.log(object);
+                //teste = object;
+                this.contatoUpdate = object;
+                console.log(this.contatoUpdate);
             },
 
             fetchData: function() {
@@ -215,7 +222,7 @@
                     .then(json => this.data = json)
             },
 
-            createContato: function(data) {
+            createContato(data) {
                 const nome = document.querySelector("input[name=nome]").value;
                 const email = document.querySelector("input[name=email]").value;
                 const telefone = document.querySelector("input[name=telefone]").value;
@@ -223,12 +230,17 @@
                 const tipo = e.options[e.selectedIndex].value;
 
                 fetch('http://127.0.0.1:8000/api/', {
-                        method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
-                        headers: new Headers({
-                            'Accept': 'application/json, text/plain, */*, multipart/form-data',
-                            'Content-Type': 'application/json'
-                        }),
-                        body: JSON.stringify({'nome':nome, 'email': email, 'telefone': telefone, 'tipo': tipo}), // Coordinate the body type with 'Content-Type'
+                    method: 'POST', // 'GET', 'PUT', 'DELETE', etc.
+                    headers: new Headers({
+                        'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                        'Content-Type': 'application/json'
+                    }),
+                    body: JSON.stringify({
+                        'nome': nome,
+                        'email': email,
+                        'telefone': telefone,
+                        'tipo': tipo
+                    }), // Coordinate the body type with 'Content-Type'
 
                 })
                     .then(response => response.json())
@@ -236,6 +248,55 @@
                         console.log(data)
                     })
                     .catch(error => console.error(error))
+            },
+
+            updateContato() {
+                const nome = document.getElementById("nomeU").value;
+                const email = document.getElementById("emailU").value;
+                const telefone = document.getElementById("telefoneU").value;
+                const e = document.getElementById("tipoU");
+                const tipo = e.options[e.selectedIndex].value;
+
+
+                fetch('http://127.0.0.1:8000/api/' + this.contatoUpdate.id + '/', {
+                    method: 'PUT', // 'GET', 'PUT', 'DELETE', etc.
+                    headers: new Headers({
+                        'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                        'Content-Type': 'application/json'
+                    }),
+                    body: JSON.stringify({
+                        'nome': nome,
+                        'email': email,
+                        'telefone': telefone,
+                        'tipo': tipo
+                    }), // Coordinate the body type with 'Content-Type'
+
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data)
+                    })
+                    .catch(error => console.error(error));
+            },
+
+            async deleteContato() {
+                const id = this.contatoUpdate.id;
+
+                if (window.confirm('Deseja deletar o contato?')) {
+                    await fetch(`//127.0.0.1:8000/api/${id}/`, {
+                        method: 'DELETE', // 'GET', 'PUT', 'DELETE', etc.
+                        headers: new Headers({
+                            'Accept': 'application/json, text/plain, */*, multipart/form-data',
+                            'Content-Type': 'application/json'
+                        })
+
+                    })
+                        .then(res => {
+                            return res.json();
+                        })
+                        .then(data => {})
+                        .catch(error => console.log(error));
+                }
             }
         },
 
