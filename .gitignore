@@ -61,3 +61,4 @@ typings/
 *.iml
 
 *.xml
+.idea/
