@@ -7,9 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>React Local</title>
     <!-- Import the React, React-Dom and Babel libraries from unpkg -->
-    <script src="https://unpkg.com/react@15/dist/react.js"></script>
-    <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
-    <script type="application/javascript" src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+    <script  src="./js/react.js"></script>
+    <script  src="./js/react-dom.js"></script>
+    <script  src="./js/babel.js"></script>
 
     <style>
         .card {
@@ -112,13 +112,19 @@
         }
 
         componentDidMount() {
+            console.time("#componentDidMount");
+            console.profile("componentDidMount()");
             fetch('//127.0.0.1:8000/api/')
                 .then(response => response.json())
                 .then(data => this.setState({ data }));
+            console.timeEnd("#componentDidMount");
+            console.profileEnd();
+            console.log(console.memory);
+            console.log(navigator.hardwareConcurrency)
         }
 
         async enviarDados(e){
-
+            console.time("#enviarDados");
             e.preventDefault();
 
             const {nome, telefone, email, tipo} = this.state;
@@ -145,6 +151,7 @@
                     this.setState({nome: '', imagem: '', email: '', telefone: '', tipo: ''});
                 })
                 .catch(error => this.setState({error}));
+            console.timeEnd("#enviarDados")
         }
 
 

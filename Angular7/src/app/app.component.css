@@ -1,0 +1,71 @@
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  width: 20%;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.container {
+  padding: 2px 16px;
+}
+
+.container-form {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  width: 400px;
+  height: 200px;
+  border: 2px solid darkgrey;
+
+}
+
+.div-form{
+  margin:0;
+  padding:0
+}
+.card-alinhar {
+  margin:0;
+  padding:0
+}
+input[type=text] {padding:5px; border:2px solid #ccc;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+input[type=text]:focus {border-color:#333; }
+
+input[type=email]:focus {border-color:#333; }
+input[type=email] {padding:5px; border:2px solid #ccc;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+input[type=tel]:focus {border-color:#333; }
+input[type=tel] {padding:5px; border:2px solid #ccc;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.estilo-btn {
+  padding:5px 15px;
+  background:#ccc; border:0 none;
+  cursor:pointer;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+#window{
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.3);
+  padding: 30px;
+  border-radius: 5px;
+  max-width: 400px;
+  min-height: 200px;
+  margin: 0 auto;
+}

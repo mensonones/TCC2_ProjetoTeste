@@ -1,0 +1,56 @@
+<div *ngIf="undefined === contatos">Loading...</div>
+
+<section>
+  <section *ngIf="undefined !== contatos" class="column">
+    <div class="card card-alinhar" *ngFor="let contato of contatos">
+      <img src="//127.0.0.1:8000{{contato.imagem}}" height="50%" width="50%" alt="profile-image">
+      <div class="container">
+        <h4><b>{{contato.nome}}</b></h4>
+        <p>{{contato.email}}</p>
+        <p>{{contato.telefone}}</p>
+        <p>{{contato.tipo}}</p>
+        <hr />
+      </div>
+      <button class="estilo-btn" id="myBtn" (click)="dialog1(); getObject(contato)" type="button">Atualizar</button>
+      <button class="estilo-btn" type="button" (click)="getObject(contato); deleteContato($event)"> Deletar</button>
+    </div>
+  </section>
+
+  <section class="container-form">
+    <div class="div-form form-group">
+      <h3>Cadastrar Contato</h3>
+      <form name="createContatoForm" #createContatoForm="ngForm">
+        <input name="nome" type="text" [(ngModel)]="newContato.nome" #nome="ngModel" placeholder="nome" />
+        <input name="email" type="email" [(ngModel)]="newContato.email" #email="ngModel" placeholder="email" />
+        <input name="telefone" type="tel" [(ngModel)]="newContato.telefone" #telefone="ngModel" placeholder="telefone" />
+        Tipo:
+        <select name="tipo" [(ngModel)]="newContato.tipo" #tipo="ngModel">
+          <option value="AMG">Amigo</option>
+          <option value="TRAB">Trabalho</option>
+        </select>
+        <br /><br />
+        <br /><br />
+        <button class="estilo-btn" type="submit" (click)="createContato($event)">Cadastrar</button>
+      </form>
+    </div>
+  </section>
+
+  <dialog id="window">
+    Atualizar Contato <br /><br />
+    <form name="updateContatoForm" #updateContatoForm="ngForm">
+      <input id="nome" value={{contatoUpdate.nome}} [(ngModel)]="contatoUpdate.nome" type="text" placeholder="nome" [ngModelOptions]="{standalone: true}" />
+      <input id="email" type="email" value={{contatoUpdate.email}} [(ngModel)]="contatoUpdate.email" placeholder="email" [ngModelOptions]="{standalone: true}" />
+      <input id="telefone" type="tel" value={{contatoUpdate.telefone}} [(ngModel)]="contatoUpdate.telefone" placeholder="telefone" [ngModelOptions]="{standalone: true}" />
+      Tipo:
+      <select id="tipo" value={{contatoUpdate.tipo}} [(ngModel)]="contatoUpdate.tipo" [ngModelOptions]="{standalone: true}">
+        <option value="AMG">Amigo</option>
+        <option value="TRAB">Trabalho</option>
+      </select>
+      <br /><br />
+      <br /><br />
+      <button type="submit" (click)="updateContato($event)">Atualizar</button>
+      <button id="exit" (click)="closedialog()">Exit</button>
+    </form>
+  </dialog>
+
+</section>
