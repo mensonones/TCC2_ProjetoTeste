@@ -56,13 +56,14 @@ export class AppComponent implements OnInit {
 
 
   getContatos() {
+    console.time("#carregarContatos");
     this.getContatosService()
       .subscribe(
         contatos => {
           this.contatos = contatos;
-          console.log(this.contatos);
         }
       );
+    console.timeEnd("#carregarContatos");
   }
 
   getContatosService() {
@@ -85,11 +86,13 @@ export class AppComponent implements OnInit {
   }
 
   createContato(e) {
+    console.time("#criarContato");
     e.preventDefault();
     this.createContatoService(this.newContato)
       .subscribe((response) => {
-        console.log(response);
       });
+    this.getContatos();
+    console.timeEnd("#criarContato");
   }
 
   updateContatoService(contato: {
@@ -99,11 +102,13 @@ export class AppComponent implements OnInit {
   }
 
   updateContato(e) {
+    console.time("#atualizarContato");
     e.preventDefault();
     this.updateContatoService(this.contatoUpdate)
       .subscribe((response) => {
         console.log(response);
       });
+    console.timeEnd("#atualizarContato");
   }
 
   deleteContatoService(contatoId: string): Observable < any > {
@@ -111,10 +116,12 @@ export class AppComponent implements OnInit {
   }
 
   deleteContato(e) {
+    console.time("#deletarContato");
     e.preventDefault();
     if (window.confirm('Deseja deletar o contato?')) {
       this.deleteContatoService(this.contatoId).subscribe(response => console.log(response));
     }
+    console.timeEnd("#deletarContato");
   }
 
 
@@ -126,12 +133,10 @@ export class AppComponent implements OnInit {
 
   closedialog() {
     const dialog = document.getElementById('window');
-
     dialog.close();
   }
 
   getObject(contato) {
-    console.log(contato);
     this.contatoUpdate = contato;
     this.contatoId = contato.id;
   }

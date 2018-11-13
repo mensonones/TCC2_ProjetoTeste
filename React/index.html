@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>React Local</title>
+    <title>ReactJs</title>
     <!-- Import the React, React-Dom and Babel libraries from unpkg -->
-    <script  src="./js/react.js"></script>
-    <script  src="./js/react-dom.js"></script>
-    <script  src="./js/babel.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.2/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/15.6.2/react-dom.js"></script>
+    <script src="babel.js"></script>
 
     <style>
         .card {
@@ -78,6 +78,7 @@
 <div id="root"></div>
 
 <script type="text/babel">
+
     class Agenda extends React.Component {
 
         constructor(props){
@@ -88,7 +89,6 @@
                     nome: '',
                     telefone: '',
                     email: '',
-                    // imagem: '',
                     tipo: '',
                 }],
                 dataModal: [{
@@ -96,7 +96,6 @@
                     nomeU: '',
                     telefoneU: '',
                     emailU: '',
-                    // imagemU: '',
                     tipoU: '',
                 }],
                 isOpen: false,
@@ -113,14 +112,14 @@
 
         componentDidMount() {
             console.time("#componentDidMount");
-            console.profile("componentDidMount()");
+            this.carregarDados();
+            console.timeEnd("#componentDidMount");
+        }
+
+        carregarDados(){
             fetch('//127.0.0.1:8000/api/')
                 .then(response => response.json())
                 .then(data => this.setState({ data }));
-            console.timeEnd("#componentDidMount");
-            console.profileEnd();
-            console.log(console.memory);
-            console.log(navigator.hardwareConcurrency)
         }
 
         async enviarDados(e){
@@ -145,18 +144,15 @@
                     return res.json();
                 })
                 .then(data => {
-                    console.log(data);
-                    //let oldData = this.state.data;
-                    //this.setState({data:[oldData, ...this.state.data]});
+                    this.carregarDados();
                     this.setState({nome: '', imagem: '', email: '', telefone: '', tipo: ''});
                 })
                 .catch(error => this.setState({error}));
             console.timeEnd("#enviarDados")
         }
 
-
         async atualizarDados(e){
-
+            console.time("#atualizarDados");
             e.preventDefault();
 
             const {id, nome, telefone, email, tipo} = this.state.dataModal;
@@ -176,19 +172,18 @@
                     return res.json();
                 })
                 .then(data => {
-                    //console.log(data);
-                    console.log(this.state.dataModal);
-                    //let oldData = this.state.data;
-                    //this.setState({data:[oldData, ...this.state.data]});
+                    this.carregarDados();
                     this.setState({nome: '', email: '', telefone: '', tipo: ''});
                 })
                 .catch(error => this.setState({error}));
+
+            console.timeEnd("#atualizarDados");
         }
 
         async deletarDado(e,data) {
+            console.time("#deletarDado");
 
             e.preventDefault();
-
 
             const {id} = data;
 
@@ -199,7 +194,6 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({'id': id})
-
             };
 
             if (window.confirm('Deseja deletar o contato?')) {
@@ -208,22 +202,21 @@
                         return res.json();
                     })
                     .then(data => {
+                        this.carregarDados();
                     })
                     .catch(error => this.setState({error}));
             }
+            console.timeEnd("#deletarDado");
 
         }
 
         onChange(e){
             const state = this.state;
-            console.log(e.target.value);
             state[e.target.name] = e.target.value;
             this.setState(state);
         };
 
-
         onChangeUpdate(e){
-            console.log(e.target.value);
             this.setState({
                 dataModal: {
                     ...this.state.dataModal,
@@ -236,11 +229,8 @@
             e.preventDefault();
 
             this.setState({ dataModal: data, isOpen: !this.state.isOpen }, () => {
-                console.log(this.state.dataModal, 'objectSelected');
-                console.log(index);
             });
         }
-
 
         render() {
             return  <section className="">
@@ -251,6 +241,7 @@
                             <div className="container">
                                 <h4><b>{item.nome}</b></h4>
                                 <p>{item.email}</p>
+                                <p>{item.telefone}</p>
                                 <p>{item.tipo}</p>
                                 <hr/>
 

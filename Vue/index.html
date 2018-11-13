@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-    <title>Agenda - VueJs</title>
+    <script src="./vue.js"></script>
+    <title>VueJs</title>
 </head>
 
 <body>
@@ -31,9 +31,9 @@
         <div v-bind:style="divform">
             <h3>Cadastrar Contato</h3>
             <form v-on:submit.prevent="createContato()">
-                <input name="nome" v-model="newContato.nome" type="text" placeholder="nome" />
-                <input name="email" v-model="newContato.email" type="email" placeholder="email" />
-                <input name="telefone" v-model="newContato.telefone" type="tel" placeholder="telefone" />
+                <input v-bind:style="inputsTexto" name="nome" v-model="newContato.nome" type="text" placeholder="nome" />
+                <input name="email" v-bind:style="inputsTexto"  v-model="newContato.email" type="email" placeholder="email" />
+                <input name="telefone" v-bind:style="inputsTexto"  v-model="newContato.telefone" type="tel" placeholder="telefone" />
                 Tipo:
                 <select name="tipo" id="tipo" v-model="newContato.tipo">
                     <option value="AMG">Amigo</option>
@@ -66,9 +66,6 @@
 
 </section>
 <script type="text/javascript">
-    window.onload = function() {
-
-    };
 
     const myHeaders = new Headers();
 
@@ -186,10 +183,6 @@
             },
         },
 
-        created() {
-            this.fetchData();
-        },
-
         mounted() {
             this.fetchData();
         },
@@ -217,12 +210,15 @@
             },
 
             fetchData: function() {
+                console.time("#carregarContatos");
                 fetch('http://127.0.0.1:8000/api/', optionsget)
                     .then(response => response.json())
-                    .then(json => this.data = json)
+                    .then(json => this.data = json);
+                console.timeEnd("#carregarContatos");
             },
 
             createContato(data) {
+                console.time("#criarContato");
                 const nome = document.querySelector("input[name=nome]").value;
                 const email = document.querySelector("input[name=email]").value;
                 const telefone = document.querySelector("input[name=telefone]").value;
@@ -246,11 +242,15 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
+                        this.fetchData();
                     })
-                    .catch(error => console.error(error))
+                    .catch(error => console.error(error));
+
+                console.timeEnd("#criarContato");
             },
 
             updateContato() {
+                console.time("#atualizarContato");
                 const nome = document.getElementById("nomeU").value;
                 const email = document.getElementById("emailU").value;
                 const telefone = document.getElementById("telefoneU").value;
@@ -275,11 +275,15 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log(data)
+                        this.fetchData();
                     })
                     .catch(error => console.error(error));
+
+                console.timeEnd("#atualizarContato");
             },
 
             async deleteContato() {
+                console.time("#deletarContato");
                 const id = this.contatoUpdate.id;
 
                 if (window.confirm('Deseja deletar o contato?')) {
@@ -292,10 +296,11 @@
 
                     })
                         .then(res => {
-                            return res.json();
+
                         })
                         .then(data => {})
                         .catch(error => console.log(error));
+                    console.timeEnd("#deletarContato");
                 }
             }
         },

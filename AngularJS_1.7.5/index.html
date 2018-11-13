@@ -154,17 +154,14 @@
 
 
         var carregarContatos = function() {
+            console.time("#carregarContatos");
             $http.get("//127.0.0.1:8000/api/").then(function(data) {
-                console.log(data.data);
                 $scope.contatos = data.data;
             }).catch(function(data, status) {
                 $scope.message = "Aconteceu um problema: " + data;
             });
+            console.timeEnd("#carregarContatos")
         };
-
-
-        $scope.classe1 = "selecionado";
-        $scope.classe2 = "negrito";
 
         $scope.isContatoSelecionado2 = function(contato) {
             $scope.idContato = contato.id;
@@ -185,21 +182,26 @@
         };
 
         $scope.adicionarContato = function(contato) {
+            console.time("#adicionarContato")
             $http.post("//127.0.0.1:8000/api/", contato).then(function(data) {
                 delete $scope.contato;
                 $scope.contatoForm.$setPristine();
                 carregarContatos();
             });
+            console.timeEnd("#adicionarContato")
         };
 
         $scope.apagarContato = function(idContato) {
+            console.time("#apagarContato");
             if (window.confirm('Deseja deletar o contato?')) {
                 $http.delete('//127.0.0.1:8000/api/' + $scope.idContato + '/', idContato);
                 carregarContatos();
             }
+            console.timeEnd("#apagarContato");
         };
 
         $scope.atualizarContato = function(contato) {
+            console.time("#atualizarContato");
             contato = {
                 nome: $scope.nome2,
                 telefone: $scope.telefone2,
@@ -210,6 +212,7 @@
                 $scope.contatoForm.$setPristine();
                 carregarContatos();
             });
+            console.timeEnd("#atualizarContato");
 
         };
 
