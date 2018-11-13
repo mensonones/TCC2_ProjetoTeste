@@ -126,6 +126,7 @@ export class AppComponent implements OnInit {
 
   closedialog() {
     const dialog = document.getElementById('window');
+
     dialog.close();
   }
 
