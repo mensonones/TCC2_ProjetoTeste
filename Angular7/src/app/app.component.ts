@@ -54,7 +54,6 @@ export class AppComponent implements OnInit {
     this.newContato = new Contato();
   }
 
-
   getContatos() {
     console.time("#carregarContatos");
     this.getContatosService()
@@ -127,7 +126,6 @@ export class AppComponent implements OnInit {
 
   dialog1() {
     const dialog = document.getElementById('window');
-
     dialog.show();
   }
 

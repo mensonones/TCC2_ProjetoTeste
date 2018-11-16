@@ -91,6 +91,8 @@
                     email: '',
                     tipo: '',
                 }],
+                contatos:[],
+                input: '',
                 dataModal: [{
                     idU: '',
                     nomeU: '',
@@ -114,6 +116,7 @@
             console.time("#componentDidMount");
             this.carregarDados();
             console.timeEnd("#componentDidMount");
+            this.state.contatos = this.state.data;
         }
 
         carregarDados(){
@@ -121,6 +124,7 @@
                 .then(response => response.json())
                 .then(data => this.setState({ data }));
         }
+
 
         async enviarDados(e){
             console.time("#enviarDados");
@@ -225,6 +229,13 @@
             });
         };
 
+        handleChange = (e) => {
+            this.setState({
+                input: e.target.value,
+            })
+        };
+
+
         getObjeto(e, data, index){
             e.preventDefault();
 
@@ -233,6 +244,11 @@
         }
 
         render() {
+
+            const list = this.state.contatos
+                .filter(d => this.state.input === '' || d.includes(this.state.input))
+                .map((d, index) => <li key={index}>{d}</li>);
+
             return  <section className="">
                 {this.state.data.map((item, i) =>
                     <section key={i} className="column">

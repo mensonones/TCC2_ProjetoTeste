@@ -98,6 +98,7 @@
             <div class="container">
                 <h4><b>{{contato.nome}}</b></h4>
                 <p>{{contato.email}}</p>
+                <p>{{contato.telefone}}</p>
                 <p>{{contato.tipo}}</p>
                 <hr />
             </div>
@@ -195,7 +196,7 @@
             console.time("#apagarContato");
             if (window.confirm('Deseja deletar o contato?')) {
                 $http.delete('//127.0.0.1:8000/api/' + $scope.idContato + '/', idContato);
-                carregarContatos();
+                //carregarContatos();
             }
             console.timeEnd("#apagarContato");
         };
