@@ -125,6 +125,7 @@ export class AppComponent implements OnInit {
 
 
   dialog1() {
+
     const dialog = document.getElementById('window');
     dialog.show();
   }
